@@ -1,10 +1,10 @@
-package com.ytmp3;
+package com.snapload;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class Ytmp3ApplicationTests {
+class SnaploadApplicationTests {
 
     @Test
     void contextLoads() {

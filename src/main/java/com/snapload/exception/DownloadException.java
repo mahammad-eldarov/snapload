@@ -1,4 +1,4 @@
-package com.ytmp3.exception;
+package com.snapload.exception;
 
 public class DownloadException extends RuntimeException {
 

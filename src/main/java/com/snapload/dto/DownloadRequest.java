@@ -1,4 +1,4 @@
-package com.ytmp3.dto;
+package com.snapload.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

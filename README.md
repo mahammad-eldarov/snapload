@@ -122,8 +122,8 @@ curl http://localhost:8080/api/health
 
 ```
 src/main/
-├── java/com/ytmp3/
-│   ├── Ytmp3Application.java
+├── java/com/snapload/
+│   ├── SnaploadApplication.java
 │   ├── config/
 │   │   └── DownloaderConfig.java
 │   ├── controller/
@@ -147,10 +147,10 @@ src/main/
 
 ```bash
 # Build image
-docker build -t ytmp3 .
+docker build -t sanpload .
 
 # Run project
-docker run -p 8080:8080 ytmp3
+docker run -p 8080:8080 sanpload
 ```
 
 ---

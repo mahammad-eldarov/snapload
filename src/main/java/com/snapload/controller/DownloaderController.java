@@ -1,8 +1,8 @@
-package com.ytmp3.controller;
+package com.snapload.controller;
 
-import com.ytmp3.dto.DownloadRequest;
-import com.ytmp3.service.DownloaderFacade;
-import com.ytmp3.service.DownloaderService;
+import com.snapload.dto.DownloadRequest;
+import com.snapload.service.DownloaderFacade;
+import com.snapload.service.DownloaderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

@@ -1,8 +1,8 @@
-package com.ytmp3.service;
+package com.snapload.service;
 
-import com.ytmp3.config.DownloaderConfig;
-import com.ytmp3.dto.DownloadRequest;
-import com.ytmp3.exception.DownloadException;
+import com.snapload.config.DownloaderConfig;
+import com.snapload.dto.DownloadRequest;
+import com.snapload.exception.DownloadException;
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

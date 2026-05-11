@@ -1,13 +1,13 @@
-package com.ytmp3;
+package com.snapload;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class Ytmp3Application {
+public class SnaploadApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(Ytmp3Application.class, args);
+        SpringApplication.run(SnaploadApplication.class, args);
     }
 
 }

@@ -1,6 +1,6 @@
-package com.ytmp3.service;
+package com.snapload.service;
 
-import com.ytmp3.config.DownloaderConfig;
+import com.snapload.config.DownloaderConfig;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.FileSystemResource;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.ytmp3.config;
+package com.snapload.config;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,4 +1,4 @@
-package com.ytmp3.exception;
+package com.snapload.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

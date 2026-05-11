@@ -4,9 +4,9 @@ plugins {
     id 'io.spring.dependency-management' version '1.1.7'
 }
 
-group = 'com.ytmp3'
+group = 'com.snapload'
 version = '0.0.1-SNAPSHOT'
-description = 'ytmp3'
+description = 'snapload'
 
 java {
     toolchain {
