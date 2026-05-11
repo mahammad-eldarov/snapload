@@ -14,6 +14,8 @@ downloader:
   audio-quality: 0
   embed-thumbnail: true
   add-metadata: true
-  filename-template: "%(title)s.mp3"
+  filename-template: "%(title)s"
   yt-dlp-command: "yt-dlp"
   ffmpeg-command: "ffmpeg"
+  video-quality: 1080
+

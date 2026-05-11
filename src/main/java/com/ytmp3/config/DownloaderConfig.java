@@ -13,12 +13,15 @@ public class DownloaderConfig {
 
     private String outputDir = "./downloads";
     private String audioFormat = "mp3";
+    private String videoFormat = "mp4";
+    private int videoQuality = 1080;
     private int audioQuality = 0;
     private boolean embedThumbnail = true;
     private boolean addMetadata = true;
-    private String filenameTemplate = "%(title)s.mp3";
+    private String filenameTemplate = "%(title)s";
     private String ytDlpCommand = "yt-dlp";
     private String ffmpegCommand = "ffmpeg";
+
 
 }
 

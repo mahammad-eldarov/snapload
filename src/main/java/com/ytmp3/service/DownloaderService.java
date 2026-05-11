@@ -1,6 +1,7 @@
 package com.ytmp3.service;
 
 import com.ytmp3.config.DownloaderConfig;
+import com.ytmp3.dto.DownloadRequest;
 import com.ytmp3.exception.DownloadException;
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
@@ -24,11 +25,11 @@ public class DownloaderService {
 
     private final DownloaderConfig config;
 
-    public ResponseBodyEmitter streamDownload(String url) {
+    public ResponseBodyEmitter streamDownload(DownloadRequest req) {
         ResponseBodyEmitter emitter = new ResponseBodyEmitter(0L);
         CompletableFuture.runAsync(() -> {
             try {
-                Process process = startProcess(url);
+                Process process = startProcess(req);
                 streamProcess(process, line -> {
                     try {
                         emitter.send(line + "\n");
@@ -47,10 +48,10 @@ public class DownloaderService {
         return emitter;
     }
 
-    public String download(String url) {
-        log.info("Download started: {}", url);
+    public String download(DownloadRequest req) {
+        log.info("Download started: {} [{}]", req.getUrl(), req.getFormat());
         try {
-            Process process = startProcess(url);
+            Process process = startProcess(req);
             StringBuilder output = new StringBuilder();
             streamProcess(process, line -> output.append(line).append("\n"));
             int exitCode = process.waitFor();
@@ -67,11 +68,12 @@ public class DownloaderService {
         }
     }
 
-    public Process startProcess(String url) throws IOException {
-        validateUrl(url);
+    public Process startProcess(DownloadRequest req) throws IOException {
+        validateUrl(req.getUrl());
+        validateRequest(req);
         checkDependencies();
         createOutputDir();
-        return new ProcessBuilder(buildCommand(url))
+        return new ProcessBuilder(buildCommand(req))
                 .redirectErrorStream(true)
                 .start();
     }
@@ -86,16 +88,34 @@ public class DownloaderService {
         }
     }
 
-    public List<String> buildCommand(String url) {
-        List<String> cmd = new ArrayList<>(List.of(
-                config.getYtDlpCommand(),
-                "--extract-audio",
-                "--audio-format", config.getAudioFormat(),
-                "--audio-quality", String.valueOf(config.getAudioQuality())
-        ));
-        if (config.isEmbedThumbnail()) cmd.add("--embed-thumbnail");
-        if (config.isAddMetadata())    cmd.add("--add-metadata");
-        cmd.addAll(List.of("--output", buildOutputTemplate(), url));
+    public List<String> buildCommand(DownloadRequest req) {
+        List<String> cmd = new ArrayList<>(List.of(config.getYtDlpCommand()));
+
+        if ("mp4".equalsIgnoreCase(req.getFormat()) || "mkv".equalsIgnoreCase(req.getFormat())) {
+            cmd.addAll(List.of(
+                    "-f", "bestvideo[vcodec^=avc1][height<=" + config.getVideoQuality() + "]+bestaudio[ext=m4a]" +
+                            "/bestvideo[height<=" + config.getVideoQuality() + "]+bestaudio[ext=m4a]",
+                    "--merge-output-format", "mp4",
+                    "--no-playlist"
+            ));
+            if (req.getStartSec() != null && req.getEndSec() != null) {
+                cmd.addAll(List.of(
+                        "--download-sections", "*" + req.getStartSec() + "-" + req.getEndSec()
+                ));
+            }
+        } else {
+            cmd.addAll(List.of(
+                    "--extract-audio",
+                    "--audio-format",  config.getAudioFormat(),
+                    "--audio-quality", String.valueOf(config.getAudioQuality()),
+                    "--no-playlist"
+            ));
+
+            if (config.isEmbedThumbnail()) cmd.add("--embed-thumbnail");
+            if (config.isAddMetadata()) cmd.add("--add-metadata");
+        }
+
+        cmd.addAll(List.of("--output", buildOutputTemplate(req.getFormat()), req.getUrl()));
         return cmd;
     }
 
@@ -139,7 +159,7 @@ public class DownloaderService {
         return Arrays.stream(output.split("\n"))
                 .filter(l -> l.contains("Destination:"))
                 .map(l -> l.substring(l.indexOf("Destination:") + 13).trim())
-                .reduce((a, b) -> b)  // son match
+                .reduce((a, b) -> b)
                 .orElse("output_" + System.currentTimeMillis() + ".mp3");
     }
 
@@ -151,7 +171,30 @@ public class DownloaderService {
         }
     }
 
-    private String buildOutputTemplate() {
+    private String buildOutputTemplate(String format) {
         return Path.of(config.getOutputDir(), config.getFilenameTemplate()).toString();
     }
+
+
+    private void validateRequest(DownloadRequest req) {
+        String fmt = req.getFormat();
+        if (fmt == null || (!fmt.equalsIgnoreCase("mp3") && !fmt.equalsIgnoreCase("mp4")))
+            throw new IllegalArgumentException("Format must be mp3 or mp4");
+
+        boolean hasStart = req.getStartSec() != null;
+        boolean hasEnd = req.getEndSec() != null;
+
+        if (hasStart != hasEnd)
+            throw new IllegalArgumentException("Start and end seconds must be given together.");
+
+        if (hasStart && req.getStartSec() < 0)
+            throw new IllegalArgumentException("Start seconds cannot be negative.");
+
+        if (hasStart && req.getEndSec() <= req.getStartSec())
+            throw new IllegalArgumentException("End seconds must be greater than start.");
+
+        if (hasStart && "mp3".equalsIgnoreCase(fmt))
+            throw new IllegalArgumentException("Trim is only supported for mp4.");
+    }
+
 }

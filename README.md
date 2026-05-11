@@ -1,15 +1,16 @@
-# YouTube → MP3 Converter (Spring Boot)
+# YouTube → MP3 / MP4 Converter (Spring Boot)
 
-A Spring Boot based YouTube to MP3 converter using yt-dlp and ffmpeg with real-time streaming support via Server-Sent Events (SSE).
+A Spring Boot based YouTube to MP3 and MP4 converter using yt-dlp and ffmpeg with real-time streaming support via Server-Sent Events (SSE).
 
 ---
 
 ## Features
 
-- Convert YouTube videos to MP3
+- Convert YouTube videos to MP3 or MP4
+- Trim video by specifying start and end time (MP4 only)
 - Real-time download/conversion progress
-- Automatic metadata embedding
-- Thumbnail embedding
+- Automatic metadata and thumbnail embedding (MP3)
+- Parallel fragment downloading for faster conversions
 - Async temporary file cleanup
 - Dockerized setup
 - REST API support
@@ -18,15 +19,22 @@ A Spring Boot based YouTube to MP3 converter using yt-dlp and ffmpeg with real-t
 ---
 
 ## Requirements
+
 - Java 17
-- ffmpeg: https://ffmpeg.org/download.html //ffmpeg.exe and ffprobe.exe - Paste these .exe files into the C:\Windows\System32 folder.
-- yt-dlp: https://github.com/yt-dlp/yt-dlp/releases //yt-dlp.exe - Paste this .exe files into the C:\Windows\System32 folder.
+- ffmpeg: https://ffmpeg.org/download.html — paste `ffmpeg.exe` and `ffprobe.exe` into `C:\Windows\System32`
+- yt-dlp: https://github.com/yt-dlp/yt-dlp/releases — paste `yt-dlp.exe` into `C:\Windows\System32`
+
+> **MP4 playback on Windows:** Install the [AV1 Video Extension](https://apps.microsoft.com/detail/9MVZQVXJBQ9V) from the Microsoft Store for full codec support. Alternatively, use [VLC Media Player](https://www.videolan.org/).
+
+---
 
 ## Build & Run
 
 ```bash
 ./gradlew bootRun
 ```
+
+---
 
 ## Usage
 
@@ -35,51 +43,104 @@ A Spring Boot based YouTube to MP3 converter using yt-dlp and ffmpeg with real-t
 Open PowerShell, navigate to the project folder and run:
 
 ```powershell
-cd path\to\ytmp3
+cd path\to\project
 .\yt "https://youtu.be/VIDEO_ID"
 ```
 
-This will automatically add the project to PATH. Reopen the terminal.
+This will automatically add the project to PATH. Reopen the terminal after setup.
 
 ### After Setup
 
 Make sure the Spring Boot application is running, then from anywhere:
 
 ```powershell
+# Download as MP3 (default)
 yt "https://youtu.be/VIDEO_ID"
+yt "https://youtu.be/VIDEO_ID" mp3
+
+# Download as MP4 (full video)
+yt "https://youtu.be/VIDEO_ID" mp4
+
+# Download MP4 trimmed (start second → end second)
+yt "https://youtu.be/VIDEO_ID" mp4 30 90
 ```
 
-The MP3 file will be saved in the `downloads` folder inside the project directory.
+> Files are saved to the `downloads` folder inside the project directory.
+
+---
 
 ## API
 
-```bash
+### Convert (non-streaming)
 
-# Conversion using Terminal
+```bash
+# Terminal
 curl -X POST http://localhost:8080/api/convert \
   -H "Content-Type: application/json" \
-  -d '{"url": "youtube video link"}'
-  
-# If you are using Windows OS, you can use the following commands in PowerShell
+  -d '{"url": "VIDEO_URL", "format": "mp3"}'
+
+# PowerShell
 Invoke-RestMethod `
   -Uri "http://localhost:8080/api/convert" `
   -Method POST `
   -ContentType "application/json" `
-  -Body '{"url":"youtube video link"}'  
-  
-# Conversion using Postman
-http://localhost:8080/api/convert //body {"url": "youtube video link"}
+  -Body '{"url": "VIDEO_URL", "format": "mp3"}'
+```
 
-# Download file
-curl -O http://localhost:8080/api/download/Song.mp3
+### Stream (real-time progress)
 
-# Health
+```bash
+curl -X POST http://localhost:8080/api/stream \
+  -H "Content-Type: application/json" \
+  -d '{"url": "VIDEO_URL", "format": "mp4", "startSec": 30, "endSec": 90}'
+```
+
+### Download file
+
+```bash
+curl -O http://localhost:8080/api/download/filename.mp3
+```
+
+### Health check
+
+```bash
 curl http://localhost:8080/api/health
 ```
 
+### Request body reference
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| url | String | Yes | YouTube video URL |
+| format | String | Yes | `mp3` or `mp4` |
+| startSec | Integer | No | Trim start (seconds) — MP4 only |
+| endSec | Integer | No | Trim end (seconds) — MP4 only |
+
+> `startSec` and `endSec` must be provided together. `endSec` must be greater than `startSec`.
+
+---
+
+## Configuration
+
+`application.yaml` / `application.properties`:
+
+```properties
+downloader.output-dir=./downloads
+downloader.audio-format=mp3
+downloader.audio-quality=0
+downloader.embed-thumbnail=true
+downloader.add-metadata=true
+downloader.filename-template=%(title)s.%(ext)s
+downloader.yt-dlp-command=yt-dlp
+downloader.ffmpeg-command=ffmpeg
+downloader.video-quality=1080
+downloader.concurrent-fragments=4
+```
+
+---
+
 ## Structure
 
-```
 src/main/
 ├── java/com/ytmp3/
 │   ├── Ytmp3Application.java
@@ -89,6 +150,9 @@ src/main/
 │   │
 │   ├── controller/
 │   │   └── DownloaderController.java
+│   │
+│   ├── dto/
+│   │   └── DownloadRequest.java
 │   │
 │   ├── service/
 │   │   ├── DownloaderFacade.java
@@ -100,23 +164,26 @@ src/main/
 │       └── GlobalExceptionHandler.java
 │
 └── resources/
-    └── application.yaml
-```
+└── application.yaml
+
+---
+
 ## Docker Support
 
-The application is containerized using Docker for easier deployment and environment consistency.
-
-### Build
-
-#Build image
 ```bash
+# Build image
 docker build -t ytmp3 .
-```
-#Run project
-```bash
+
+# Run project
 docker run -p 8080:8080 ytmp3
 ```
 
-## Notice
-1. After the video is converted, the mp3 file will be saved to the download folder on your computer.
-2. If there is a problem saving to the download folder on your computer, if you convert the video to mp3 format for the first time, a .downloads folder will be created in the project folder and saved there. It will not create a new folder next time.
+---
+
+## Notes
+
+1. Converted files are saved to the `downloads` folder in the project directory.
+2. If the `downloads` folder does not exist, it is created automatically on first use.
+3. Playlist URLs are supported — only the specified video is downloaded, not the full playlist.
+4. MP4 trim is based on seconds. Example: `startSec=30, endSec=90` extracts the 30–90 second range.
+5. MP4 video quality defaults to 1080p. If the video does not have 1080p, the best available quality is used.
