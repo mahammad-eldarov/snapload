@@ -36,10 +36,12 @@ if ($start -ge 0 -and $end -le $start) {
 try {
     Invoke-RestMethod -Uri "http://localhost:8080/api/health" -Method GET | Out-Null
 } catch {
-    Write-Host "Starting Spring Boot..."
-    Start-Process -FilePath "$scriptDir\gradlew.bat" -ArgumentList "bootRun" -WindowStyle Hidden
+    Write-Host "Starting Snapload..."
+    Start-Process -FilePath "docker-compose" `
+        -ArgumentList "-f `"$scriptDir\docker-compose.yml`" up -d" `
+        -WindowStyle Hidden
     Write-Host "Please wait..."
-    Start-Sleep -Seconds 15
+    Start-Sleep -Seconds 20
 }
 
 # ── Request body ────────────────────────────────────────────────
