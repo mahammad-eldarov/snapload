@@ -1,5 +1,25 @@
 # YouTube → MP3 Converter (Spring Boot)
 
+
+# YTMP3 Downloader
+
+A Spring Boot based YouTube to MP3 converter using yt-dlp and ffmpeg with real-time streaming support via Server-Sent Events (SSE).
+
+---
+
+## Features
+
+- Convert YouTube videos to MP3
+- Real-time download/conversion progress
+- Automatic metadata embedding
+- Thumbnail embedding
+- Async temporary file cleanup
+- Dockerized setup
+- REST API support
+- PowerShell CLI integration
+
+---
+
 ## Requirements
 - Java 17
 - ffmpeg: https://ffmpeg.org/download.html //ffmpeg.exe and ffprobe.exe - Paste these .exe files into the C:\Windows\System32 folder.
@@ -84,6 +104,20 @@ src/main/
 │
 └── resources/
     └── application.yaml
+```
+## Docker Support
+
+The application is containerized using Docker for easier deployment and environment consistency.
+
+### Build
+
+#Build image
+```bash
+docker build -t ytmp3 .
+```
+#Run project
+```bash
+docker run -p 8080:8080 ytmp3
 ```
 
 ## Notice
