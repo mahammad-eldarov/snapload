@@ -9,7 +9,7 @@ spring:
 
 downloader:
   output-dir:
-    "${user.home}/Downloads"
+    "/app/downloads"
   audio-format: "mp3"
   audio-quality: 0
   embed-thumbnail: true
