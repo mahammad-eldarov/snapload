@@ -1,0 +1,7 @@
+services:
+  snapload:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - ~/Downloads:/app/downloads

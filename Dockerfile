@@ -12,5 +12,7 @@ RUN apk add --no-cache yt-dlp ffmpeg curl unzip && \
 
 COPY --from=build /app/build/libs/*.jar app.jar
 
+VOLUME /app/downloads
+
 EXPOSE 8080
 ENTRYPOINT ["java", "-XX:TieredStopAtLevel=1", "-jar", "app.jar"]
