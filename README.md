@@ -65,13 +65,23 @@ curl http://localhost:8080/api/health
 ```
 src/main/
 ├── java/com/ytmp3/
-│   ├── YtMp3Application.java
-│   ├── config/DownloaderConfig.java
-│   ├── controller/DownloaderController.java
-│   ├── service/DownloaderService.java
+│   ├── Ytmp3Application.java
+│   │
+│   ├── config/
+│   │   └── DownloaderConfig.java
+│   │
+│   ├── controller/
+│   │   └── DownloaderController.java
+│   │
+│   ├── service/
+│   │   ├── DownloaderFacade.java
+│   │   ├── DownloaderService.java
+│   │   └── FileService.java
+│   │
 │   └── exception/
 │       ├── DownloadException.java
 │       └── GlobalExceptionHandler.java
+│
 └── resources/
     └── application.yaml
 ```
