@@ -10,7 +10,6 @@ A Spring Boot based YouTube to MP3 and MP4 converter using yt-dlp and ffmpeg wit
 - Trim video by specifying start and end time (MP4 only)
 - Real-time download/conversion progress
 - Automatic metadata and thumbnail embedding (MP3)
-- Parallel fragment downloading for faster conversions
 - Async temporary file cleanup
 - Dockerized setup
 - REST API support
@@ -55,7 +54,6 @@ Make sure the Spring Boot application is running, then from anywhere:
 
 ```powershell
 # Download as MP3 (default)
-yt "https://youtu.be/VIDEO_ID"
 yt "https://youtu.be/VIDEO_ID" mp3
 
 # Download as MP4 (full video)
@@ -120,51 +118,28 @@ curl http://localhost:8080/api/health
 
 ---
 
-## Configuration
-
-`application.yaml` / `application.properties`:
-
-```properties
-downloader.output-dir=./downloads
-downloader.audio-format=mp3
-downloader.audio-quality=0
-downloader.embed-thumbnail=true
-downloader.add-metadata=true
-downloader.filename-template=%(title)s.%(ext)s
-downloader.yt-dlp-command=yt-dlp
-downloader.ffmpeg-command=ffmpeg
-downloader.video-quality=1080
-downloader.concurrent-fragments=4
-```
-
----
-
 ## Structure
 
+```
 src/main/
 ├── java/com/ytmp3/
 │   ├── Ytmp3Application.java
-│   │
 │   ├── config/
 │   │   └── DownloaderConfig.java
-│   │
 │   ├── controller/
 │   │   └── DownloaderController.java
-│   │
 │   ├── dto/
 │   │   └── DownloadRequest.java
-│   │
 │   ├── service/
 │   │   ├── DownloaderFacade.java
 │   │   ├── DownloaderService.java
 │   │   └── FileService.java
-│   │
 │   └── exception/
 │       ├── DownloadException.java
 │       └── GlobalExceptionHandler.java
-│
 └── resources/
-└── application.yaml
+    └── application.yaml
+```
 
 ---
 
