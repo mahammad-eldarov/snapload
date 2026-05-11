@@ -1,8 +1,5 @@
 # YouTube → MP3 Converter (Spring Boot)
 
-
-# YTMP3 Downloader
-
 A Spring Boot based YouTube to MP3 converter using yt-dlp and ffmpeg with real-time streaming support via Server-Sent Events (SSE).
 
 ---
