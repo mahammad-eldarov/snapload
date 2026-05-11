@@ -1,0 +1,19 @@
+spring:
+  application:
+    name:
+      ytmp3
+
+
+  main:
+    lazy-initialization: true
+
+downloader:
+  output-dir:
+    "${user.home}/Downloads"
+  audio-format: "mp3"
+  audio-quality: 0
+  embed-thumbnail: true
+  add-metadata: true
+  filename-template: "%(title)s.mp3"
+  yt-dlp-command: "yt-dlp"
+  ffmpeg-command: "ffmpeg"
