@@ -147,10 +147,10 @@ src/main/
 
 ```bash
 # Build image
-docker build -t sanpload .
+docker build -t snapload .
 
 # Run project
-docker run -p 8080:8080 sanpload
+docker run -p 8080:8080 snapload
 ```
 
 ---
