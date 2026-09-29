@@ -151,6 +151,9 @@ docker build -t snapload .
 
 # Run project
 docker run -p 8080:8080 snapload
+
+#If downloaded files do not appear in the download folder, use the code below.
+docker run -p 8080:8080 -v C:\Users\Your-PC\Downloads:/app/downloads snapload
 ```
 
 ---
